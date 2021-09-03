@@ -1,0 +1,47 @@
+create folder app
+create folder app/static
+create folders data/db
+
+run docker-compose run django-admin startproject core .
+
+docker-compose up
+
+# settings.py
+
+# import decouple to use the .env file. In this setup, the .env file was placed in the document root...with the requirements and docker files
+
+from decouple import config
+
+# database
+'ENGINE': config('DB_ENGINE'),
+'NAME': config('DB_NAME'),
+'USER': config('DB_USER'),
+'PASSWORD': config('DB_PASSWORD'),
+'HOST': config('DB_HOST'),
+'PORT': config('DB_PORT'),
+
+# change the secret key
+SECRET_KEY = config('SECRET_KEY')
+
+
+ALLOWED_HOSTS = []
+ALLOWED_HOSTS.extend(
+    filter(
+        None,
+        os.environ.get('ALLOWED_HOSTS', '').split(','),
+    )
+)
+
+# migrate
+python manage.py migrate
+
+
+add this to the static files
+STATIC_URL = '/static/static/'
+MEDIA_URL = '/static/media/'
+
+MEDIA_ROOT = '/vol/web/media'
+STATIC_ROOT = '/vol/web/static'
+
+# Run collectstatic
+python manage.py collectstatic
